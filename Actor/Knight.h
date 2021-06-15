@@ -108,7 +108,7 @@ private:
 	bool goIntoPortal = false;
 	bool isAnimation = false;//是否在执行帧动画动作
 	int attackCount;
-	bool bulletCt;
+	bool bulletCT;
 };
 
 #endif
