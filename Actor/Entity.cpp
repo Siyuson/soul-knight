@@ -1,4 +1,4 @@
-﻿#include "Entity.h"
+#include "Entity.h"
 #include"FlowWord.h"
 
 Entity::~Entity() {}
@@ -67,6 +67,9 @@ void Entity::deductHP(INT32 delta) { //minus HP of this entity
 	flowWord->showWord(-delta,
 		getSprite()->getPosition() +
 		Vec2(0, this->getContentSize().height / 2.2f));
+
+	auto blink = Blink::create(0.1f, 2);
+	this->getSprite()->runAction(blink);
 }
 
 void Entity::setHP(INT32 HP) { this->HP = std::min(HP, maxHP); }
