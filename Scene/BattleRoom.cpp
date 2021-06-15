@@ -1,4 +1,4 @@
-﻿#include "BattleRoom.h"
+#include "BattleRoom.h"
 #include "BattleScene.h"
 #include "Props/prop.h"
 #include "Map/Statue.h"
@@ -236,6 +236,12 @@ void BattleRoom::createEnemy() {
 				LayerPlayer - 1);
 			break;
 		}
+		if (rand() % 10 == 0){
+			enemy->getSprite()->setScale(3, 3); 
+			enemy->setHP(enemy->getMaxHP() * 2);
+		}
+		else
+			enemy->getSprite()->setScale(1.2, 1.2);
 
 		enemy->setType(enemyType);
 		enemy->addShadow(Point(enemy->getContentSize().width / 2.3f,
