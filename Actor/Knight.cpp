@@ -1,4 +1,4 @@
-﻿#include "Knight.h"
+#include "Knight.h"
 #include "Attack/Weapon.h"
 #include "FlowWord.h"
 #include "Map/Statue.h"
@@ -76,6 +76,7 @@ Animate* Knight::getAnimate() {
 }
 
 bool Knight::init() {
+	this->bulletCT = 0;
 	this->HP = this->maxHP = 5;
 	this->armor = this->maxArmor = 5;
 	this->MP = this->maxMP = 200;
@@ -190,8 +191,10 @@ void Knight::registerKeyboardEvent() {
 					enemy->deductHP(5);
 				else if (boss != nullptr)
 					boss->deductHP(10);
-			}
-			weaponAttack(last);
+			}			
+			if (ultimateSkillTime > 300) this->bulletCT = false;
+			else this->bulletCT = true;
+			weaponAttack(last,bulletCT);
 			break;
 
 		case EventKeyboard::KeyCode::KEY_K:
@@ -257,52 +260,38 @@ void Knight::useUltimateSkill() {
 	audio->preloadEffect("audioEffect//explosion.wav");*/
 	static INT32 temUS = 0;
 
+	Sprite* skillIamge = Sprite::create("Character//KnightSkill.png");
+	skillIamge->setPosition(Point(getContentSize().width / 2, getContentSize().height / 2));
+	skillIamge->setGlobalZOrder(LayerPlayer-1);
+
+	//创建技能动画
+	auto animation = Animation::create();
+	char nameSize[30] = { 0 };
+	for (INT32 i = 1; i < 3; i++) {
+		sprintf(nameSize, "Character//KnightSkill%d.png", i);
+		animation->addSpriteFrameWithFile(nameSize);
+	}
+	//设置动画帧的时间间隔
+	animation->setDelayPerUnit(0.1f);
+	//设置播放循环 一直播放 为-1
+	animation->setLoops(25);
+	//设置动画结束后恢复到第一帧
+	animation->setRestoreOriginalFrame(true);
+
+	auto sequence = Sequence::create(
+		Animate::create(animation),
+		RemoveSelf::create(), NULL);  //生成动作序列
+	skillIamge->runAction(sequence);
+
+	this->addChild(skillIamge);
+
+	/*if (skillIamge->getParent()!=nullptr) this->bulletCT = true;
+	else this->bulletCT=false;*/
+
 	//audio->stopEffect(temUS);  //暂停之前的音效
 	//audio->playEffect("audioEffect//explosion.wav", false);
 
-	auto skillCircle = DrawNode::create();
-	skillCircle->drawSolidCircle(Point(this->getContentSize().width / 2,
-		this->getContentSize().height / 2),
-		280.0f, CC_DEGREES_TO_RADIANS(360), 100,
-		Color4F(1.0f, 0.8f, .0f, 0.3f));
-
-	skillCircle->setGlobalZOrder(LayerPlayer);
-
-	auto fadeIn = FadeIn::create(0.1f);
-	auto fadeOut = FadeOut::create(0.2f);
-	auto blink = Blink::create(0.3f, 2);
-
-	auto sequence = Sequence::create(
-		Spawn::create(Sequence::create(fadeIn, fadeOut, NULL), blink, NULL),
-		RemoveSelf::create(), NULL);  //生成动作序列
-
-	this->addChild(skillCircle);
-
-	skillCircle->runAction(sequence);  //执行动画
-
-	if (this->atBattleRoom == nullptr) return;
-
 	Vector<Enemy*>& vecEnemy = atBattleRoom->getVecEnemy();
-
-	for (auto& e : vecEnemy) {
-		if (e->getParent() == nullptr) continue;
-
-		float enemyX = e->getPositionX(), enemyY = e->getPositionY();
-
-		if (sqrt(pow(getPositionX() - enemyX, 2) +
-			pow(getPositionY() - enemyY, 2)) <= 280.0f) {
-			e->deductHP(20 * damageBuff);  //在技能圆内 扣血
-		}
-	}
-
-	auto boss = atBattleRoom->getBoss();
-	if (boss != nullptr && boss->getParent() != nullptr) {
-		float bossX = boss->getPositionX(), bossY = boss->getPositionY();
-		if (sqrt(pow(getPositionX() - bossX, 2) + pow(getPositionY() - bossY, 2)) <=
-			280.0f) {
-			boss->deductHP(20 * damageBuff);  //在技能圆内 扣血
-		}
-	}
 
 	if (this->atBattleRoom != nullptr) {
 		assert(atHall == nullptr);
@@ -388,7 +377,7 @@ bool Knight::checkPortal() {  //检测传送门 按j进入下一关卡
 	return false;
 }
 
-void Knight::weaponAttack(Vec2 last) {
+void Knight::weaponAttack(Vec2 last,bool flag ) {
 	if (this->MP <= 0 && this->weapon->getMPConsumption() > 0) return;
 
 	this->setMP(this->getMP() - this->weapon->getMPConsumption());
@@ -440,9 +429,8 @@ void Knight::weaponAttack(Vec2 last) {
 	audio->preloadEffect("audioEffect//bulletEffect.mp3");*/
 	static INT32 temBullet = 0;
 
-	attackCount++;
 	Bullet* bullet;
-	if (attackCount <= 5)  bullet = this->weapon->createBullet(fireSpeed, firePower, false);
+	if (!flag)  bullet = this->weapon->createBullet(fireSpeed, firePower, false);
 	else {
 		bullet = this->weapon->createBullet(fireSpeed, firePower, true);
 		attackCount = 0;
