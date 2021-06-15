@@ -392,7 +392,7 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		AudioEngine::stop(temKnife);		//audio->stopEffect(temKnife);//暂停之前的音效
 		//temKnife = audio->playEffect("audioEffect//bulletEffect.wav", false);
 		temKnife = AudioEngine::play2d("audioEffect//bulletEffect.wav");
-		//AudioEngine::resume(0);
+		
 		this->weapon->knifeAttack(this);
 		return;
 	}
@@ -441,6 +441,7 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 	bullet->setPosition(curPos);
 	AudioEngine::stop(temBullet);  //暂停之前的音效
 	temBullet = AudioEngine::play2d("audioEffect//bulletEffect.mp3", false);
+	AudioEngine::resumeAll();
 	(atBattleRoom != nullptr ? atBattleRoom : atHall)->addChild(bullet);
 	(atBattleRoom != nullptr ? atBattleRoom : atHall)
 		->getVecPlayerBullet()
