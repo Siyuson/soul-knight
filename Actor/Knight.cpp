@@ -6,6 +6,7 @@
 #include "Scene/Hall.h"
 #include "AudioEngine.h"
 
+static bool isRight = true;
 Knight::~Knight() {}
 
 void Knight::bindBattleRoom(BattleRoom* battleRoom) { atBattleRoom = battleRoom; }
@@ -106,7 +107,7 @@ void Knight::registerKeyboardEvent() {
     
 	listener->onKeyPressed = [&](EventKeyboard::KeyCode code, Event*) {
 		static Vec2 last;
-		static bool isRight = true;
+		
 		if (code != EventKeyboard::KeyCode::KEY_D &&
 			code != EventKeyboard::KeyCode::KEY_W &&
 			code != EventKeyboard::KeyCode::KEY_A &&
@@ -188,7 +189,7 @@ void Knight::registerKeyboardEvent() {
 					break;
 				}
 				else if (enemy != nullptr)
-					enemy->deductHP(5);
+				this->weapon->knifeAttack(this,isRight);
 				else if (boss != nullptr)
 					boss->deductHP(10);
 			}			
@@ -393,7 +394,7 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		//temKnife = audio->playEffect("audioEffect//bulletEffect.wav", false);
 		temKnife = AudioEngine::play2d("audioEffect//bulletEffect.wav");
 		
-		this->weapon->knifeAttack(this);
+		this->weapon->knifeAttack(this,isRight);
 		return;
 	}
 	Vec2 fireSpeed = last * (this->weapon->getFireSpeed());
