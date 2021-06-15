@@ -36,7 +36,7 @@ public:
 
 	void setWeaponState(bool state);
 
-	void knifeAttack(Knight* knight);
+	void knifeAttack(Knight* knight,bool);
 
 	void setBulletType(INT32);
 
