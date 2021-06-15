@@ -4,7 +4,7 @@
 #include "Map/Statue.h"
 #include "Scene/BattleRoom.h"
 #include "Scene/Hall.h"
-//#include "SimpleAudioEngine.h"
+#include "AudioEngine.h"
 
 Knight::~Knight() {}
 
@@ -235,7 +235,8 @@ void Knight::registerKeyboardEvent() {
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-void Knight::useUltimateSkill() {
+void Knight::useUltimateSkill() 
+{
 	if (ultimateSkillTime < ultimateSkillGap) {
 		INT32 cdTime = ceil((ultimateSkillGap - ultimateSkillTime) / 60.0f);
 		auto textLabel = Label::createWithTTF(
@@ -290,7 +291,8 @@ void Knight::useUltimateSkill() {
 
 	//audio->stopEffect(temUS);  //暂停之前的音效
 	//audio->playEffect("audioEffect//explosion.wav", false);
-
+	/*AudioEngine::stop(temUS);
+	AudioEngine::play2d("audioEffect//explosion.wav");*/
 	Vector<Enemy*>& vecEnemy = atBattleRoom->getVecEnemy();
 
 	if (this->atBattleRoom != nullptr) {
@@ -385,13 +387,14 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		//添加音效
 		//auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 		//audio->preloadEffect("audioEffect//bulletEffect.wav");
-		//static INT32 temKnife = 0;
-
-		//audio->stopEffect(temKnife);//暂停之前的音效
+		AudioEngine::preload("audioEffect//bulletEffect.wav");
+		static INT32 temKnife = 0;
+		AudioEngine::stop(temKnife);		//audio->stopEffect(temKnife);//暂停之前的音效
 		//temKnife = audio->playEffect("audioEffect//bulletEffect.wav", false);
-
-		//this->weapon->knifeAttack(this);
-		//return;
+		temKnife = AudioEngine::play2d("audioEffect//bulletEffect.wav");
+		//AudioEngine::resume(0);
+		this->weapon->knifeAttack(this);
+		return;
 	}
 	Vec2 fireSpeed = last * (this->weapon->getFireSpeed());
 	INT32 firePower = this->weapon->getAttack();
@@ -436,8 +439,8 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		attackCount = 0;
 	}
 	bullet->setPosition(curPos);
-	//audio->stopEffect(temBullet);  //暂停之前的音效
-	//temBullet = audio->playEffect("audioEffect//bulletEffect.mp3", false);
+	AudioEngine::stop(temBullet);  //暂停之前的音效
+	temBullet = AudioEngine::play2d("audioEffect//bulletEffect.mp3", false);
 	(atBattleRoom != nullptr ? atBattleRoom : atHall)->addChild(bullet);
 	(atBattleRoom != nullptr ? atBattleRoom : atHall)
 		->getVecPlayerBullet()
