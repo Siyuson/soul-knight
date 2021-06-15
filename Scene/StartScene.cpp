@@ -1,7 +1,7 @@
-﻿#include "StartScene.h"
+#include "StartScene.h"
 #include"Scene/SafeScene.h"
 #include"SetScene.h"
-
+#include "AudioEngine.h"
 USING_NS_CC;
 
 Scene* StartScene::createScene() { return StartScene::create(); }
@@ -26,8 +26,12 @@ bool StartScene::init()
 	/*背景音乐*/
 	//audio = CocosDenshion::SimpleAudioEngine::getInstance();
 
-	/*if (!audio->isBackgroundMusicPlaying())
-		audio->playBackgroundMusic("bkMusic.mp3", true);*/
+	//if (!audio->isBackgroundMusicPlaying())
+		//audio->playBackgroundMusic("bkMusic.mp3", true);
+	//if (AudioEngine::getPlayingAudioCount() == 0)
+	//{
+		auto BKM = AudioEngine::play2d("bkMusic.mp3", true);
+	//}
 
 	/*开始界面背景图像*/
 	auto startImg = Sprite::create("start.png");
