@@ -1,5 +1,5 @@
 #include "Weapon.h"
-
+#include "AudioEngine.h"
 Weapon::Weapon() {}
 
 bool Weapon::init() { return true; }
@@ -37,6 +37,7 @@ void Weapon::knifeAttack(Knight* knight)
 		if (sqrt(pow(knight->getPositionX() - enemyX, 2) +
 			pow(knight->getPositionY() - enemyY, 2)) <= 80.0f) {
 			e->deductHP(this->attack * knight->getDamageBuff());
+			//AudioEngine::play2d("audioEffect//knifeEffect.wav");
 		}
 	}
 }
