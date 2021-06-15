@@ -24,7 +24,7 @@ void Weapon::setWeaponState(bool state) { this->weaponState = state; }
 
 void Weapon::setBulletType(INT32 type) { this->bulletType = type; }
 
-void Weapon::knifeAttack(Knight* knight)
+void Weapon::knifeAttack(Knight* knight,bool isRight)
 {
 	if (knight->getAtBattleRoom() == nullptr) return;
 	Vector<Enemy*>& vecEnemy = knight->getAtBattleRoom()->getVecEnemy();
@@ -38,6 +38,20 @@ void Weapon::knifeAttack(Knight* knight)
 			pow(knight->getPositionY() - enemyY, 2)) <= 80.0f) {
 			e->deductHP(this->attack * knight->getDamageBuff());
 			//AudioEngine::play2d("audioEffect//knifeEffect.wav");
+
+			{
+				auto knifeImage = Sprite::create("Character//Knife.png");
+				knifeImage->setPosition(Point(getContentSize().width / 2 + (isRight? 10 : -20), getContentSize().height / 2));
+				knifeImage->setGlobalZOrder(LayerPlayer + 1);
+				if (isRight) knifeImage->setFlippedX(false);
+				else knifeImage->setFlippedX(true);
+
+				auto sequence = Sequence::create(DelayTime::create(0.1f),
+					RemoveSelf::create(), NULL);
+				knifeImage->runAction(sequence);
+				this->addChild(knifeImage);
+			}
+
 		}
 	}
 }
