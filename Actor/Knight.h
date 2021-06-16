@@ -1,4 +1,4 @@
-﻿#ifndef _KNIGHT_H_
+#ifndef _KNIGHT_H_
 #define _KNIGHT_H_
 #include "cocos2d.h"
 #include "Entity.h"
@@ -29,7 +29,7 @@ public:
 
 	void registerKeyboardEvent();
 
-	void weaponAttack(Vec2 last);
+	void weaponAttack(Vec2 last,bool flag = 0);
 
 	void useUltimateSkill();
 
