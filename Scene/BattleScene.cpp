@@ -265,7 +265,7 @@ void BattleScene::updatePlayerPos() {
 
 	//!把视角还给玩家
 	auto room = knight->atBattleRoom;
-	if ( room!=nullptr && room->playerVisited && room->allKilled()&&room->roomType!=BEGIN)
+	if ( room!=nullptr && !room->isViewReturn && room->allKilled()&&room->roomType!=BEGIN)
 	{
 		auto posKnight = knight->getPosition();
 		auto shift = posKnight - Vec2(room->centerX, room->centerY);//位移
@@ -281,7 +281,7 @@ void BattleScene::updatePlayerPos() {
 			hall->changePositionBy(-shift.x, -shift.y);
 		}
 		knight->setPosition(posKnight.x - shift.x, posKnight.y + -shift.y);
-		room->playerVisited = false;
+		room->isViewReturn = true;
 	}
 
 
