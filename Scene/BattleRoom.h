@@ -91,6 +91,7 @@ private:
 	bool visDir[CNTDIR] = { false }, visDirCpy[CNTDIR];
 
 	bool playerVisited = false;
+	bool isViewReturn = false;
 
 private:
 	Sprite* portal = nullptr; //传送门
