@@ -1,18 +1,18 @@
-﻿#include "FlowWord.h"
+#include "FlowWord.h"
 #include"Const/Const.h"
 
 bool FlowWord::init()
 {
-	m_textLab = Label::create("", "fonts/Marker Felt.ttf", 22);
-	m_textLab->setColor(ccc3(255, 0, 0));
-	m_textLab->setAnchorPoint(ccp(0.5, 0.5));
+	m_textLab = Label::createWithTTF("", "fonts/Marker Felt.ttf", 22);
+	m_textLab->setColor(Color3B(255, 0, 0));
+	m_textLab->setAnchorPoint(Point(0.5, 0.5));
 	m_textLab->setGlobalZOrder(TOP);
 
 	this->addChild(m_textLab);
 	return true;
 }
 
-void FlowWord::showWord(int num, CCPoint pos)
+void FlowWord::showWord(int num, Point pos)
 {
 	if (num > 0) {
 		m_textLab->setString("+" + Value(num).asString());
