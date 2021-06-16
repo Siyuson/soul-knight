@@ -1,4 +1,4 @@
-﻿#include "BattleScene.h"
+#include "BattleScene.h"
 #include "SetScene.h"
 #include "StartScene.h"
 
@@ -223,8 +223,25 @@ void BattleScene::updatePlayerPos() {
 				curMiniRoom->setVisible(true);  //修改小地图状态
 				if (curRoom->roomType == NORMAL)
 					curMiniRoom->setColorWhite();
-				curRoom->playerVisited = true;
-
+				//!将视角中心给到房间
+				if (!curRoom->playerVisited) {
+					auto posKnight = knight->getPosition();
+					auto shift = Vec2(curRoom->centerX, curRoom->centerY) - posKnight;//位移
+					for (INT32 y = 0; y < SIZEMTX; y++) { //遍历所有地图修改子类位置
+						for (INT32 x = 0; x < SIZEMTX; x++) {
+							if (battleRoom[x][y] == nullptr) continue;
+							BattleRoom* curRoom = battleRoom[x][y];
+							curRoom->centerX -= shift.x, curRoom->centerY -= shift.y;
+							curRoom->changePositionBy(-shift.x, -shift.y);
+						}
+					}
+					for (auto hall : vecHall) { //修改所有子类位置
+						hall->changePositionBy(-shift.x, -shift.y);
+					}
+					knight->setPosition(posKnight.x - shift.x, posKnight.y + -shift.y);
+					curRoom->playerVisited = true;
+				}
+				
 				for (INT32 dir = 0; dir < CNTDIR; dir++) {
 					if (curRoom->visDir[dir] == false) continue;
 					BattleRoom* toRoom = battleRoom[x + DIRX[dir]][y + DIRY[dir]];
@@ -246,17 +263,47 @@ void BattleScene::updatePlayerPos() {
 		if (inHall) knight->bindBattleRoom(nullptr), knight->bindHall(hall);
 	}
 
-	for (INT32 y = 0; y < SIZEMTX; y++) { //修改所有子类位置
-		for (INT32 x = 0; x < SIZEMTX; x++) {
-			if (battleRoom[x][y] == nullptr) continue;
-			BattleRoom* curRoom = battleRoom[x][y];
-			curRoom->centerX -= ispeedX, curRoom->centerY -= ispeedY;
-			curRoom->changePositionBy(-ispeedX, -ispeedY);
+	//!把视角还给玩家
+	auto room = knight->atBattleRoom;
+	if ( room!=nullptr && room->playerVisited && room->allKilled()&&room->roomType!=BEGIN)
+	{
+		auto posKnight = knight->getPosition();
+		auto shift = posKnight - Vec2(room->centerX, room->centerY);//位移
+		for (INT32 y = 0; y < SIZEMTX; y++) { //遍历所有地图修改子类位置
+			for (INT32 x = 0; x < SIZEMTX; x++) {
+				if (battleRoom[x][y] == nullptr) continue;
+				BattleRoom* curRoom = battleRoom[x][y];
+				curRoom->centerX -= shift.x, curRoom->centerY -= shift.y;
+				curRoom->changePositionBy(-shift.x, -shift.y);
+			}
+		}
+		for (auto hall : vecHall) { //修改所有子类位置
+			hall->changePositionBy(-shift.x, -shift.y);
+		}
+		knight->setPosition(posKnight.x - shift.x, posKnight.y + -shift.y);
+		room->playerVisited = false;
+	}
+
+
+	if (knight->atBattleRoom != nullptr && !knight->atBattleRoom->allKilled()){		
+		auto posKnight = knight->getPosition();
+		knight->setPosition(posKnight.x + ispeedX, posKnight.y + ispeedY);
+	}
+	else
+	{
+		for (INT32 y = 0; y < SIZEMTX; y++) { //遍历所有地图修改子类位置
+			for (INT32 x = 0; x < SIZEMTX; x++) {
+				if (battleRoom[x][y] == nullptr) continue;
+				BattleRoom* curRoom = battleRoom[x][y];
+				curRoom->centerX -= ispeedX, curRoom->centerY -= ispeedY;
+				curRoom->changePositionBy(-ispeedX, -ispeedY);
+			}
+		}
+		for (auto hall : vecHall) { //修改所有子类位置
+			hall->changePositionBy(-ispeedX, -ispeedY);
 		}
 	}
-	for (auto hall : vecHall) { //修改所有子类位置
-		hall->changePositionBy(-ispeedX, -ispeedY);
-	}
+		
 }
 
 void BattleScene::updatePlayerInfoBar() {  //更新人物信息显示
