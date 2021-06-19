@@ -4,7 +4,10 @@
 
 USING_NS_CC;
 
-Scene* SetScene::createScene() { return SetScene::create(); }
+Scene* SetScene::createScene() 
+{ 
+	return SetScene::create();
+}
 
 static void problemLoading(const char* filename)
 {
@@ -75,33 +78,36 @@ bool SetScene::init()
 	this->addChild(MenuHigherVolume, 1);
 	this->addChild(MenuLowerVolume, 1);
 
-	/*修改音量数值*/
-	//auto audio = AudioEngine::getDefaultProfile();
-
 	///*获取音量数值（将其转成10的倍数）*/
 	INT32 tem = AudioEngine::getVolume(0) * 100 / 1;
-	if (tem % 10 >= 5) {
+	if (tem % 10 >= 5) 
+	{
 		volume = tem / 10 * 10 + 10;
 	}
-	else {
+	else 
+	{
 		volume = tem / 10 * 10;
 	}
 
 	volumeNumLab->setString(Value(volume).asString());
 
-	if (volume == 0) {
+	if (volume == 0) 
+	{
 		MenuLowerVolume->setOpacity(100);
 	}
-	else if (volume == 100) {
+	else if (volume == 100) 
+	{
 		MenuHigherVolume->setOpacity(100);
 	}
 
 	///*修改ON/OFF状态*/
-	if (AudioEngine::isEnabled()) {
+	if (AudioEngine::isEnabled()) 
+	{
 		Menu01->setVisible(true);
 		Menu02->setVisible(false);
 	}
-	else {
+	else 
+	{
 		Menu01->setVisible(false);
 		Menu02->setVisible(true);
 	}
@@ -122,36 +128,34 @@ void SetScene::menuCloseCallbackChange(Ref* pSender)
 	Menu01->setVisible(1 - (Menu01->isVisible()));
 	Menu02->setVisible(1 - (Menu02->isVisible()));
 
-	//auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-
 	/*切换音乐的播放状态*/
-	if (Menu01->isVisible()) {
-		//audio->resumeBackgroundMusic();
+	if (Menu01->isVisible()) 
+	{
 		AudioEngine::resumeAll();
 	}
-	else {
-		//audio->stopBackgroundMusic();
-		AudioEngine::stop(0);
+	else 
+	{
+		AudioEngine::pauseAll();
 	}
 }
 
 /*升高音量*/
 void SetScene::menuCloseCallbackVolumeHigher(Ref* pSender) {
 	/*检测是否达到最大值*/
-	if (volume == 100) {
+	if (volume == 100)
+	{
 		return;
 	}
 
 	/*修改音量*/
 	volume += 10;
-	AudioEngine::setVolume(0, volume);
-	//auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	//audio->setBackgroundMusicVolume(volume / 100.0f);
+	AudioEngine::setVolume(0, float(volume)/100.0);
 
 	/*标签变化*/
 	volumeNumLab->setString(Value(volume).asString());
 	MenuLowerVolume->setOpacity(255);
-	if (volume == 100) {
+	if (volume == 100) 
+	{
 		MenuHigherVolume->setOpacity(100);
 	}
 }
@@ -159,22 +163,20 @@ void SetScene::menuCloseCallbackVolumeHigher(Ref* pSender) {
 /*降低音量*/
 void SetScene::menuCloseCallbackVolumeLower(Ref* pSender) {
 	/*检测是否达到最大值*/
-	if (volume == 0) {
+	if (volume == 0) 
+	{
 		return;
 	}
 
 	/*修改音量*/
 	volume -= 10;
-	AudioEngine::setVolume(0, volume);
-	//auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	//audio->setBackgroundMusicVolume(volume / 100.0f);
+	AudioEngine::setVolume(0, float(volume) / 100.0);
 
 	/*标签变化*/
 	volumeNumLab->setString(Value(volume).asString());
 	MenuHigherVolume->setOpacity(255);
-	if (volume == 0) {
+	if (volume == 0) 
+	{
 		MenuLowerVolume->setOpacity(100);
 	}
 }
-
-
