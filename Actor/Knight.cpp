@@ -390,10 +390,11 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		//audio->preloadEffect("audioEffect//bulletEffect.wav");
 		AudioEngine::preload("audioEffect//bulletEffect.wav");
 		static INT32 temKnife = 0;
-		AudioEngine::stop(temKnife);		//audio->stopEffect(temKnife);//暂停之前的音效
+		AudioEngine::pauseAll();	
+		//audio->stopEffect(temKnife);//暂停之前的音效
 		//temKnife = audio->playEffect("audioEffect//bulletEffect.wav", false);
 		temKnife = AudioEngine::play2d("audioEffect//bulletEffect.wav");
-		
+		AudioEngine::resumeAll();
 		this->weapon->knifeAttack(this,isRight);
 		return;
 	}
@@ -440,7 +441,7 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		attackCount = 0;
 	}
 	bullet->setPosition(curPos);
-	AudioEngine::stop(temBullet);  //暂停之前的音效
+	AudioEngine::pauseAll();  //暂停之前的音效
 	temBullet = AudioEngine::play2d("audioEffect//bulletEffect.mp3", false);
 	AudioEngine::resumeAll();
 	(atBattleRoom != nullptr ? atBattleRoom : atHall)->addChild(bullet);
