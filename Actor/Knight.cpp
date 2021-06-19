@@ -258,8 +258,7 @@ void Knight::useUltimateSkill()
 	ultimateSkillTime = 0;
 
 	log("using ultimate skill!");
-	/*auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->preloadEffect("audioEffect//explosion.wav");*/
+
 	static INT32 temUS = 0;
 
 	Sprite* skillIamge = Sprite::create("Character//KnightSkill.png");
@@ -287,13 +286,6 @@ void Knight::useUltimateSkill()
 
 	this->addChild(skillIamge);
 
-	/*if (skillIamge->getParent()!=nullptr) this->bulletCT = true;
-	else this->bulletCT=false;*/
-
-	//audio->stopEffect(temUS);  //暂停之前的音效
-	//audio->playEffect("audioEffect//explosion.wav", false);
-	/*AudioEngine::stop(temUS);
-	AudioEngine::play2d("audioEffect//explosion.wav");*/
 	Vector<Enemy*>& vecEnemy = atBattleRoom->getVecEnemy();
 
 	if (this->atBattleRoom != nullptr) {
@@ -386,13 +378,9 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 	this->setMP(this->getMP() - this->weapon->getMPConsumption());
 	if (this->weapon->getWeaponState() == false) {
 		//添加音效
-		//auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-		//audio->preloadEffect("audioEffect//bulletEffect.wav");
 		AudioEngine::preload("audioEffect//bulletEffect.wav");
 		static INT32 temKnife = 0;
 		AudioEngine::pauseAll();	
-		//audio->stopEffect(temKnife);//暂停之前的音效
-		//temKnife = audio->playEffect("audioEffect//bulletEffect.wav", false);
 		temKnife = AudioEngine::play2d("audioEffect//bulletEffect.wav");
 		AudioEngine::resumeAll();
 		this->weapon->knifeAttack(this,isRight);
@@ -430,8 +418,7 @@ void Knight::weaponAttack(Vec2 last,bool flag ) {
 		}
 	}
 
-	/*auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->preloadEffect("audioEffect//bulletEffect.mp3");*/
+	
 	static INT32 temBullet = 0;
 
 	Bullet* bullet;
