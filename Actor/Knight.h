@@ -93,6 +93,8 @@ public:
 
 	void addGold(INT32);
 
+	INT32 getGold() { return this->gold; }
+
 private:
 	INT32 armor = 5, maxArmor = 5;
 	INT32 MP = 200, maxMP = 200;
@@ -106,9 +108,10 @@ private:
 	Hall* atHall = nullptr;
 	bool isInvincible = false; //是否无敌
 	bool goIntoPortal = false;
-	bool isAnimation = false;//是否在执行帧动画动作
 	int attackCount;
 	bool bulletCT;
+	bool isAnimation = false;//是否在执行帧动画动作
+	
 };
 
 #endif
