@@ -16,6 +16,8 @@ Vector<Prop*>& BattleRoom::getVecProps() { return vecProps; }
 
 Vector<Weapon*>& BattleRoom::getVecWeapon() { return vecWeapon; }
 
+Vector<Sprite*>& BattleRoom::getVecWoodBox() { return vecWoodBox; }
+
 Boss* BattleRoom::getBoss() { return boss; }
 
 Statue* BattleRoom::getStatue() { return statue; }
@@ -23,6 +25,8 @@ Statue* BattleRoom::getStatue() { return statue; }
 Sprite* BattleRoom::getPortal() { return portal; }
 
 bool BattleRoom::init() {
+	srand(time(0));
+	roomTag = rand();
 	centerX = .0f, centerY = .0f;
 	upLeftX = .0f, upLeftY = .0f;
 	downRightX = .0f, downRightY = .0f;
@@ -44,9 +48,11 @@ bool BattleRoom::init() {
 void BattleRoom::update(float delta) {
 	this->checkStatue(); //雕像碰撞检测
 	this->checkPortal(); //检测传送门
+	//this->checkWoodBox();
 	this->bulletMove();
 	this->bulletCollistionCheck();
 	this->removeKilledEnemy(); //移除血量<=0的敌人
+	
 }
 
 bool BattleRoom::createRoom(BattleRoom*& toRoom, BattleRoom* curRoom, INT32 dir,
@@ -96,6 +102,18 @@ void BattleRoom::generateDoor(float X, float Y, INT32 layer) {
 	//添加阴影
 }
 
+void BattleRoom::generateWoodBox(float X, float Y, INT32 layer) {
+	Sprite* tmpSprite = Sprite::create("Map//woodbox.png");
+	tmpSprite->setScale(1.4);
+	this->addChild(tmpSprite, layer);
+	tmpSprite->setGlobalZOrder(layer);
+	vecWoodBox.pushBack(tmpSprite);
+
+	tmpSprite->setPosition(Point(X, Y));
+	tmpSprite->setVisible(true);
+
+}
+
 void BattleRoom::generateStatue() {
 	auto statue = Statue::create();
 
@@ -134,6 +152,7 @@ void BattleRoom::createMap() {
 }
 
 void BattleRoom::addMapElement() {
+	srand(time(0));
 	const float X = centerX - FLOORWIDTH * (sizeWidth / 2);
 	const float Y = centerY + FLOORHEIGHT * (sizeHeight / 2);
 	//(X, Y) is upLeft Position;
@@ -141,6 +160,9 @@ void BattleRoom::addMapElement() {
 	// get vertices Position
 	downRightX = X + FLOORWIDTH * (sizeWidth - 2);
 	downRightY = Y - FLOORHEIGHT * (sizeHeight - 2);
+
+	const float CX = (upLeftX + downRightX) / 2;
+	const float CY = (upLeftY + downRightY) / 2;
 
 	float curX = X, curY = Y;
 	for (INT32 H = sizeHeight - 1; H >= 0; H--) {  // for height and width
@@ -183,6 +205,34 @@ void BattleRoom::addMapElement() {
 			}
 			else {
 				generateFloor(curX, curY, LayerPlayer - 2);
+				if (roomType == NORMAL) {
+					switch (roomTag % 5) {
+						case 0:
+							if ((H >= 3 * sizeHeight / 4 || H <= 1 * sizeHeight / 4)
+								&&(W >= 3 * sizeWidth / 4 || W <= 1 * sizeWidth / 4))
+								generateWoodBox(curX, curY, LayerPlayer - 2);
+							break;
+						case 1:
+							if ((H <= 3 * sizeHeight / 4 && H >= 1 * sizeHeight / 4)
+								&& (W <= 3 * sizeWidth / 4 && W >= 1 * sizeWidth / 4))
+								generateWoodBox(curX, curY, LayerPlayer - 2);
+							break;
+						case 2:
+							if (W== 3 * sizeWidth / 4 && H<= 3 * sizeHeight / 4 
+								|| W == 1 * sizeWidth / 4 && H >= 1 * sizeHeight / 4) {
+								generateWoodBox(curX, curY, LayerPlayer - 2);
+							}
+							break;
+						case 3:
+							if (H == 3 * sizeHeight / 4 && W <= 3 * sizeWidth / 4
+								|| H == 1 * sizeHeight / 4 && W >= 1 * sizeWidth / 4) {
+								generateWoodBox(curX, curY, LayerPlayer - 2);
+							}
+							break;
+						default:
+							break;
+					}
+				}//generateWoodBox
 			}  // randomly generate floor and Wall
 
 			curX += FLOORWIDTH;
@@ -237,11 +287,11 @@ void BattleRoom::createEnemy() {
 			break;
 		}
 		if (rand() % 10 == 0){
-			enemy->getSprite()->setScale(3, 3); 
-			enemy->setHP(enemy->getMaxHP() * 2);
+			enemy->getSprite()->setScale(2, 2); 
+			enemy->setHP(enemy->getMaxHP() * 3);
 		}
 		else
-			enemy->getSprite()->setScale(1.2, 1.2);
+			enemy->getSprite()->setScale(1, 1);
 
 		enemy->setType(enemyType);
 		enemy->addShadow(Point(enemy->getContentSize().width / 2.3f,
@@ -252,14 +302,35 @@ void BattleRoom::createEnemy() {
 
 	INT32 addChildNum =
 		std::min(static_cast<INT32>(vecEnemy.size()), 4 + rand() % 3);
-	for (auto it = vecEnemy.rbegin(); it != vecEnemy.rbegin() + addChildNum;
-		it++) {
+	//for (auto it = vecEnemy.rbegin(); it != vecEnemy.rbegin() + addChildNum;
+	//	it++) {
+	//	float enemyX = centerX + (rand() * 2 - RAND_MAX) % 300;
+	//	float enemyY = centerY + (rand() * 2 - RAND_MAX) % 300;
+
+	//	(*it)->setPosition(Point(enemyX, enemyY));
+	//	(*it)->setIsAdded(true);
+	//	this->addChild(*it);  //分批次添加到场景
+	//}
+	bool loop = 1;
+	for (int i = vecEnemy.size()-1; i > vecEnemy.size()- addChildNum -1; i--)
+	{
+		auto enemy = vecEnemy.at(i);
 		float enemyX = centerX + (rand() * 2 - RAND_MAX) % 300;
 		float enemyY = centerY + (rand() * 2 - RAND_MAX) % 300;
+		enemy->setPosition(Point(enemyX, enemyY));
+		for (auto& it : getVecWoodBox()) {
+			auto enemyRect = enemy->getBoundingBox();
+			if (it->getBoundingBox().intersectsRect(enemyRect))
+			{
+				i++;		//如果与木箱的位置重叠，重设位置
+				loop = 0;
+				break;
+			}
+		}
+		if (!loop) { loop = 1; continue; }
 
-		(*it)->setPosition(Point(enemyX, enemyY));
-		(*it)->setIsAdded(true);
-		this->addChild(*it);  //分批次添加到场景
+		enemy->setIsAdded(true);
+		this->addChild(enemy,LayerPlayer);
 	}
 }
 
@@ -328,9 +399,10 @@ bool BattleRoom::checkPlayerPosition(Knight* knight, float& ispeedX,
 		else {
 			if (knight->getNeedCreateBox() == false) knight->setNeedCreateBox(true);
 			closeDoor();
+			
 		}
 
-		if (!allKilled()) {
+		if (!allKilled()) {	//限制骑士活动范围
 			if (ispeedX > 0 && knightX >= downRightX) ispeedX = .0f;
 			if (ispeedX < 0 && knightX <= upLeftX) ispeedX = .0f;
 			if (ispeedY > 0 && knightY >= upLeftY + 20) ispeedY = .0f;
@@ -402,6 +474,7 @@ void BattleRoom::bulletCollistionCheck() {
 			}
 		}
 		else {
+			bool flag = true; //因为子弹可能同时碰撞到多个物体，所以要多选一执行
 			for (INT32 j = 0; j < vecEnemy.size(); ++j) { //检测怪物
 				auto enemy = vecEnemy.at(j);
 				if (enemy->getParent() == nullptr || enemy->getIsKilled()) continue;
@@ -414,12 +487,31 @@ void BattleRoom::bulletCollistionCheck() {
 					bullet->removeFromParent();
 					vecPlayerBullet.eraseObject(bullet);
 					--i;
+					flag = false;
+					break;
+				}
+			}
+			if(flag)
+			for (INT32 j = 0; j < vecWoodBox.size(); ++j) {
+				if (vecWoodBox.at(j) == nullptr || vecWoodBox.at(j)->getParent() == nullptr) continue;
+				auto woodBoxRect = vecWoodBox.at(j)->getBoundingBox();
+				if (bulletRect.intersectsRect(woodBoxRect)) {
+					Blink* blink = Blink::create(0.1f, 2);
+					vecWoodBox.at(j)->runAction(blink);
+					vecWoodBox.at(j)->removeFromParent();
+					vecWoodBox.eraseObject(vecWoodBox.at(j));
+
+					bullet->showEffect(bullet->getPosition(), this); //子弹击中特效
+					bullet->removeFromParent();
+					vecPlayerBullet.eraseObject(bullet);
+					i--;
 					break;
 				}
 			}
 		}
 	}
 	for (INT32 i = 0; i < vecEnemyBullet.size(); ++i) {
+		bool flag = true;	//同上，防止bug
 		auto bullet = vecEnemyBullet.at(i);
 		Rect bulletRect = bullet->getBoundingBox();
 		Rect knightRect = knight->getBoundingBox();
@@ -428,7 +520,26 @@ void BattleRoom::bulletCollistionCheck() {
 			bullet->showEffect(bullet->getPosition(), this); //子弹击中特效
 			bullet->removeFromParent();
 			vecEnemyBullet.eraseObject(bullet);
-			--i;
+			i--;
+			flag = false;
+			continue;
+		}
+		if(flag)
+		for (INT32 j = 0; j < vecWoodBox.size(); ++j) {
+			if (vecWoodBox.at(j) == nullptr || vecWoodBox.at(j)->getParent() == nullptr) continue;
+			auto woodBoxRect = vecWoodBox.at(j)->getBoundingBox();
+			if (bulletRect.intersectsRect(woodBoxRect)) {
+				Blink* blink = Blink::create(0.1f, 2);
+				vecWoodBox.at(j)->runAction(blink);
+				vecWoodBox.at(j)->removeFromParent();
+				vecWoodBox.eraseObject(vecWoodBox.at(j));
+
+				bullet->showEffect(bullet->getPosition(), this); //子弹击中特效
+				bullet->removeFromParent();
+				vecEnemyBullet.eraseObject(bullet);
+				i--;
+				break;
+			}
 		}
 	}
 }
@@ -486,6 +597,31 @@ void BattleRoom::checkPortal() {
 	else {
 		portalTextLabel->setVisible(false);
 	}
+}
+
+void BattleRoom::checkWoodBox(float& ispeedX, float&ispeedY)
+{
+	auto knightRect = knight->getBoundingBox();
+	for (auto& woodbox : vecWoodBox) {
+		auto woodboxRect = woodbox->getBoundingBox();
+		if (woodboxRect.intersectsRect(knightRect)) {
+			auto shift = woodbox->getPosition() - knight->getPosition();
+			if (shift.x * ispeedX > 0) ispeedX = -ispeedX;
+			if (shift.y * ispeedY > 0) ispeedY = -ispeedY;
+			break;
+		}
+		for (auto enemy : vecEnemy)
+		{
+			auto enemyRect = enemy->getBoundingBox();
+			if (enemyRect.intersectsRect(woodboxRect))
+			{
+				auto shift = woodbox->getPosition() - enemy->getPosition();
+				enemy->setPosition(enemy->getPosition() - shift * 0.1);
+			}
+		}
+	}
+	
+	
 }
 
 void BattleRoom::removeKilledEnemy() {
