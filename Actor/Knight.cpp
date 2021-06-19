@@ -78,7 +78,7 @@ Animate* Knight::getAnimate() {
 
 bool Knight::init() {
 	this->bulletCT = 0;
-	this->HP = this->maxHP = 5;
+	this->HP = this->maxHP = 99999;
 	this->armor = this->maxArmor = 5;
 	this->MP = this->maxMP = 200;
 	this->gold = 0;
