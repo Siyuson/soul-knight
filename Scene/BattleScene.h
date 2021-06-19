@@ -1,4 +1,4 @@
-﻿#ifndef _BATTLESCENE_H_
+#ifndef _BATTLESCENE_H_
 #define _BATTLESCENE_H_
 
 #include "Actor\Knight.h"
