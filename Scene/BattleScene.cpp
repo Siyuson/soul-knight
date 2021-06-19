@@ -117,7 +117,7 @@ bool BattleScene::init() {
 	gameLevelLabel->setGlobalZOrder(TOP);
 
 	// add knight to scene remove it from prev scene
-
+	knight->setScale(0.8);
 	this->addChild(knight);
 
 	knight->moveSpeedX = knight->moveSpeedY = .0f;
@@ -284,8 +284,11 @@ void BattleScene::updatePlayerPos() {
 		room->isViewReturn = true;
 	}
 
+	
+	if(knight->atBattleRoom!=nullptr)
+		knight->atBattleRoom->checkWoodBox(ispeedX, ispeedY);//检测木箱
 
-	if (knight->atBattleRoom != nullptr && !knight->atBattleRoom->allKilled()){		
+	if (knight->atBattleRoom != nullptr && !knight->atBattleRoom->allKilled()){	
 		auto posKnight = knight->getPosition();
 		knight->setPosition(posKnight.x + ispeedX, posKnight.y + ispeedY);
 	}
@@ -351,12 +354,22 @@ void BattleScene::updateEnemy() { //更新敌人
 			std::min(static_cast<INT32>(vecEnemy.size()), 4 + rand() % 3);
 		for (auto it = vecEnemy.rbegin();
 			it != vecEnemy.rbegin() + addChildNum && it != vecEnemy.rend(); it++) {
+			remake:
 			float enemyX =
 				knight->atBattleRoom->centerX + (rand() * 2 - RAND_MAX) % 300;
 			float enemyY =
 				knight->atBattleRoom->centerY + (rand() * 2 - RAND_MAX) % 300;
-
 			(*it)->setPosition(Point(enemyX, enemyY));
+
+			for (auto& it_wbox : knight->atBattleRoom->getVecWoodBox()) {
+				auto enemyRect = (*it)->getBoundingBox();
+				if (it_wbox->getBoundingBox().intersectsRect(enemyRect)){
+					//如果与木箱的位置重叠，重设位置
+					goto remake;
+					break;
+				}
+			}
+
 			(*it)->setIsAdded(true);
 			(*it)->setIsKilled(true);  //暂时设为死亡 防止立刻生成攻击玩家
 			(*it)->getSprite()->setOpacity(80);
