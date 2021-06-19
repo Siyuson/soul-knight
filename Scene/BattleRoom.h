@@ -1,4 +1,4 @@
-﻿#ifndef _BATTLEROOM_H
+#ifndef _BATTLEROOM_H
 #define _BATTLEROOM_H
 
 #include "cocos2d.h"
@@ -37,6 +37,8 @@ public:
 
 	void generateStatue();
 
+	void generateWoodBox(float, float, INT32 layer);
+
 	void closeDoor();
 
 	void openDoor();
@@ -46,6 +48,8 @@ public:
 	Vector<Prop*>& getVecProps();
 
 	Vector<Weapon*>& getVecWeapon();
+
+	Vector<Sprite*>& getVecWoodBox();
 
 	void createBox(float x, float y);
 
@@ -62,6 +66,8 @@ public:
 	void checkStatue(); //检测雕像
 
 	void checkPortal(); //检测传送门
+
+	void checkWoodBox(float&, float&);//检测木箱子
 
 	void removeKilledEnemy(); //将死亡的敌人removeFromParent 有死亡效果
 
@@ -87,6 +93,7 @@ private:
 	INT32 x, y;  // row and column in SIZEMTX * SIZEMTX BattleRoom matrix
 
 	INT32 roomType = NORMAL;
+	int roomTag;
 
 	bool visDir[CNTDIR] = { false }, visDirCpy[CNTDIR];
 
@@ -106,6 +113,7 @@ protected:
 	Vector<Prop*> vecProps;
 	Vector<Weapon*> vecWeapon;
 	Vector<Sprite*> vecBox;
+	Vector<Sprite*> vecWoodBox;
 
 };
 
