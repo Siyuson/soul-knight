@@ -2,56 +2,94 @@
 #include "AudioEngine.h"
 Weapon::Weapon() {}
 
-bool Weapon::init() { return true; }
+bool Weapon::init() 
+{
+	return true; 
+}
 
 Weapon::~Weapon() {}
 
-void Weapon::setFireSpeed(float fireSpeed) { this->fireSpeed = fireSpeed; }
+void Weapon::setFireSpeed(float fireSpeed) 
+{
+	this->fireSpeed = fireSpeed;
+}
 
-float Weapon::getFireSpeed() { return this->fireSpeed; }
+float Weapon::getFireSpeed() 
+{
+	return this->fireSpeed; 
+}
 
-void Weapon::setAttack(INT32 attack) { this->attack = attack; }
+void Weapon::setAttack(INT32 attack) 
+{
+	this->attack = attack; 
+}
 
-INT32  Weapon::getAttack() { return this->attack; }
+INT32  Weapon::getAttack() 
+{
+	return this->attack; 
+}
 
-INT32 Weapon::getMPConsumption() { return mpConsumption; }
+INT32 Weapon::getMPConsumption() 
+{
+	return mpConsumption; 
+}
 
-void Weapon::setMPConsumption(INT32 deta) { this->mpConsumption = deta; }
+void Weapon::setMPConsumption(INT32 deta) 
+{
+	this->mpConsumption = deta; 
+}
 
-bool Weapon::getWeaponState() { return this->weaponState; }
+bool Weapon::getWeaponState() 
+{
+	return this->weaponState; 
+}
 
-void Weapon::setWeaponState(bool state) { this->weaponState = state; }
+void Weapon::setWeaponState(bool state) 
+{
+	this->weaponState = state; 
+}
 
-void Weapon::setBulletType(INT32 type) { this->bulletType = type; }
+void Weapon::setBulletType(INT32 type) 
+{
+	this->bulletType = type; 
+}
 
 void Weapon::knifeAttack(Knight* knight,bool isRight)
 {
-	if (knight->getAtBattleRoom() == nullptr) return;
+	if (knight->getAtBattleRoom() == nullptr)
+	{
+		return;
+	}
 	Vector<Enemy*>& vecEnemy = knight->getAtBattleRoom()->getVecEnemy();
 
-	for (auto& e : vecEnemy) {
-		if (e->getParent() == nullptr) continue;
-
+	for (auto& e : vecEnemy) 
+	{
+		if (e->getParent() == nullptr)
+		{
+			continue;
+		}
 		float enemyX = e->getPositionX(), enemyY = e->getPositionY();
 
-		if (sqrt(pow(knight->getPositionX() - enemyX, 2) +
-			pow(knight->getPositionY() - enemyY, 2)) <= 80.0f) {
+		if (sqrt(pow(knight->getPositionX() - enemyX, 2) + pow(knight->getPositionY() - enemyY, 2)) <= 80.0f) 
+		{
 			e->deductHP(this->attack * knight->getDamageBuff());
-			//AudioEngine::play2d("audioEffect//knifeEffect.wav");
-
 			{
 				auto knifeImage = Sprite::create("Character//Knife.png");
 				knifeImage->setPosition(Point(getContentSize().width / 2 + (isRight? 10 : -20), getContentSize().height / 2));
 				knifeImage->setGlobalZOrder(LayerPlayer + 1);
-				if (isRight) knifeImage->setFlippedX(false);
-				else knifeImage->setFlippedX(true);
-
+				if (isRight)
+				{
+					knifeImage->setFlippedX(false);
+				}
+				else 
+				{
+					knifeImage->setFlippedX(true);
+				}
 				auto sequence = Sequence::create(DelayTime::create(0.1f),
 					RemoveSelf::create(), NULL);
 				knifeImage->runAction(sequence);
 				this->addChild(knifeImage);
 			}
-
 		}
 	}
 }
@@ -62,28 +100,44 @@ Bullet* Weapon::createBullet(Vec2 speed, INT32 firePower, bool isBig)
 	bullet->setBulletSpeed(speed);
 
 	char fileName[30];
-	if (isBig == false) {
+	if (isBig == false) //判断子弹是否为强化子弹并以此来选择不同图片
+	{   
 		bullet->setAttack(firePower);
 		sprintf(fileName, "Bullet//bullet_%d.png", this->bulletType);
 	}
-	else {
+	else 
+	{
 		bullet->setAttack(firePower * 3);
 		sprintf(fileName, "Bullet//bigBullet.png");
 	}
 	bullet->bindSprite(Sprite::create(fileName), 12);
 
-	if (speed.x == 0 && speed.y > 0) bullet->getSprite()->setRotation(-90.0f);
-	else if (speed.x < 0)    bullet->getSprite()->setRotation(-(180.0f + 180.0f * atan(speed.y / speed.x) / PI));
-	else if (speed.x == 0 && speed.y < 0)       bullet->getSprite()->setRotation(-(180.0f + 180.0f * atan(speed.y / speed.x) / PI));
-	else    bullet->getSprite()->setRotation(-(180.0f + 180.0f * atan(speed.y / speed.x) / PI));
+	if (speed.x == 0 && speed.y > 0)
+	{
+		bullet->getSprite()->setRotation(-90.0f);
+	}
+	else if (speed.x < 0)
+	{
+		bullet->getSprite()->setRotation(-(180.0f + 180.0f * atan(speed.y / speed.x) / PI));
+	}
+	else if (speed.x == 0 && speed.y < 0)
+	{
+		bullet->getSprite()->setRotation(-(180.0f + 180.0f * atan(speed.y / speed.x) / PI));
+	}
+	else
+	{
+		bullet->getSprite()->setRotation(-(180.0f + 180.0f * atan(speed.y / speed.x) / PI));
+	}
 	return bullet;
 }
 
-void Weapon::weaponInit(float speed, INT32 weaponAttack, INT32 decMP, int weaponType, bool state, int bulletType) {
+void Weapon::weaponInit(float speed, INT32 weaponAttack, INT32 decMP, int weaponType, bool state, int bulletType) 
+{
 	setFireSpeed(speed);
 	setAttack(weaponAttack);
 	setMPConsumption(decMP);
-	char fileName[30]; sprintf(fileName, "Weapon//weapon%d.png", weaponType);
+	char fileName[30]; 
+	sprintf(fileName, "Weapon//weapon%d.png", weaponType);
 	bindSprite(Sprite::create(fileName), LayerPlayer);
 	setWeaponState(state);
 	setBulletType(bulletType);
