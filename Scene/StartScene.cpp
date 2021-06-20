@@ -24,14 +24,7 @@ bool StartScene::init()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	/*背景音乐*/
-	//audio = CocosDenshion::SimpleAudioEngine::getInstance();
-
-	//if (!audio->isBackgroundMusicPlaying())
-		//audio->playBackgroundMusic("bkMusic.mp3", true);
-	//if (AudioEngine::getPlayingAudioCount() == 0)
-	//{
-		auto BKM = AudioEngine::play2d("bkMusic.mp3", true);
-	//}
+	auto BKM = AudioEngine::play2d("bkMusic.mp3", true);
 
 	/*开始界面背景图像*/
 	auto startImg = Sprite::create("start.png");
@@ -46,8 +39,13 @@ bool StartScene::init()
 	}
 
 	/*创建菜单*/
-	auto startLab = Label::createWithTTF("START", "fonts/Marker Felt.ttf", 72);
-	auto exitLab = Label::createWithTTF("EXIT", "fonts/Marker Felt.ttf", 72);
+	auto startLab = 
+		Label::createWithSystemFont("Start Game", "Arial", 72);
+	auto exitLab = 
+		Label::createWithSystemFont("Quit Game", "Arial", 72);
+	
+	startLab->setColor(Color3B::WHITE);
+	exitLab->setColor(Color3B::WHITE);
 
 	auto startMenu = MenuItemLabel::create(startLab, CC_CALLBACK_1(StartScene::menuCloseCallbackStart, this));
 	auto exitMenu = MenuItemLabel::create(exitLab, CC_CALLBACK_1(StartScene::menuCloseCallbackEnd, this));
