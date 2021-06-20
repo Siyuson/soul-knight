@@ -60,19 +60,25 @@ bool BattleScene::init() {
 
 	/*创建状态信息进度条*/
 	auto StatusBackGround = Sprite::create("Character//StatusBackground.png");
+	StatusBackGround->setScale(2);
 
 	BloodLoadingBar = ui::LoadingBar::create("Character//StatusBlood.png");
 	ArmorLoadingBar = ui::LoadingBar::create("Character//StatusArmor.png");
 	MPLoadingBar = ui::LoadingBar::create("Character//StatusMP.png");
 
+	BloodLoadingBar->setScale(2);
+	ArmorLoadingBar->setScale(2);
+	MPLoadingBar->setScale(2);
+
+
 	BloodLoadingBar->setDirection(ui::LoadingBar::Direction::LEFT);
 	ArmorLoadingBar->setDirection(ui::LoadingBar::Direction::LEFT);
 	MPLoadingBar->setDirection(ui::LoadingBar::Direction::LEFT);
 
-	StatusBackGround->setPosition(80, 680);
-	BloodLoadingBar->setPosition(Vec2(89, 698));
-	ArmorLoadingBar->setPosition(Vec2(89, 680));
-	MPLoadingBar->setPosition(Vec2(89, 664));
+	StatusBackGround->setPosition(120, 650);//80,680
+	BloodLoadingBar->setPosition(Point(135, 688));//89,698
+	ArmorLoadingBar->setPosition(Point(135, 655));//89,680
+	MPLoadingBar->setPosition(Point(135, 622));//89,664
 
 	this->addChild(StatusBackGround, TOP);
 	this->addChild(BloodLoadingBar, TOP);
@@ -86,13 +92,13 @@ bool BattleScene::init() {
 	MPLoadingBar->setGlobalZOrder(TOP);
 
 	/*状态数字信息*/
-	HPLabel = Label::createWithTTF("0", "fonts/Marker Felt.ttf", 15);
-	armorLabel = Label::createWithTTF("0", "fonts/Marker Felt.ttf", 15);
-	MPLabel = Label::createWithTTF("0", "fonts/Marker Felt.ttf", 15);
+	HPLabel = Label::createWithTTF("0", "fonts/Marker Felt.ttf", 20);
+	armorLabel = Label::createWithTTF("0", "fonts/Marker Felt.ttf", 20);
+	MPLabel = Label::createWithTTF("0", "fonts/Marker Felt.ttf", 20);
 
-	HPLabel->setPosition(Vec2(89, 698));
-	armorLabel->setPosition(Vec2(89, 680));
-	MPLabel->setPosition(Vec2(89, 664));
+	HPLabel->setPosition(Point(135, 688));
+	armorLabel->setPosition(Point(135, 655));
+	MPLabel->setPosition(Point(135, 622));
 
 	this->addChild(HPLabel, TOP);
 	this->addChild(armorLabel, TOP);
@@ -104,8 +110,12 @@ bool BattleScene::init() {
 	MPLabel->setGlobalZOrder(TOP);
 
 	/*金币数,关卡数*/
-	goldLabel = Label::createWithTTF("gold : 0", "fonts/Marker Felt.ttf", 30);
-	gameLevelLabel = Label::createWithTTF("", "fonts/Marker Felt.ttf", 30);
+	goldLabel = 
+		Label::createWithSystemFont("Gold : 0", "Arial", 30);
+	gameLevelLabel =
+		Label::createWithSystemFont("", "Arial", 30);
+
+	goldLabel->setScale(2);
 
 	goldLabel->setPosition(890, 680);
 	gameLevelLabel->setPosition(1130, 400);
@@ -162,11 +172,14 @@ void BattleScene::update(float delta) {
 #ifndef DEBUG
 	if (knight->HP <= 0) { //人物死亡 回到安全地图
 		this->cleanup();
-		auto textLabel = Label::createWithTTF("You are dead! Returning to SafeScene...",
-			"fonts/Marker Felt.ttf", 40);
-		textLabel->setPosition(Point(640, 360));
-		textLabel->setGlobalZOrder(TOP);
-		this->addChild(textLabel);
+		auto visible = Director::getInstance()->getVisibleSize();
+		auto sprite = Sprite::create("Character//die.jfif");
+		sprite->setPosition(640, 360);
+		sprite->setGlobalZOrder(TOP);
+		sprite->setScale(visible.width / sprite->getContentSize().width, visible.height / sprite->getContentSize().height);
+		auto fadeIn = FadeIn::create(2.0f);
+		sprite->runAction(fadeIn);
+		this->addChild(sprite);
 
 		auto blink = Blink::create(2.0f, 3);
 		auto fadeOut = FadeOut::create(2.0f);
